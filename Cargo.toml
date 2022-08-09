@@ -1,8 +1,21 @@
 [package]
 name = "rocksdb-es"
 version = "0.1.0"
+authors = ["Tigran Avakyan"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "Apache-2.0"
+keywords = ["cqrs", "event-sourcing", "es", "rocks"]
+description = "A RocksDB implementation of an event repository for cqrs-es."
+repository = "https://github.com/serverlesstechnology/postgres-es"
+documentation = "https://docs.rs/rocksdb-es"
+readme = "README.md"
 
 [dependencies]
+cqrs-es = "0.4.4"
+thiserror = "1.0"
+async-trait = "0.1"
+rocksdb = "0.19.0"
+
+#serde = { version = "1.0", features = ["derive"]}
+#serde_json = "1.0"
+#smol or tokio?
