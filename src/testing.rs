@@ -122,7 +122,6 @@ pub(crate) mod tests {
         let tmp = tempdir().expect("Error: Unable to create a temporary directory");
         let file_path = tmp.path().join(TEST_STORAGE_FILE_NAME);
         (tmp, file_path)
-
     }
     pub(crate) fn test_event_envelope(
         id: &str,
@@ -154,5 +153,4 @@ pub(crate) mod tests {
             current_snapshot,
         }
     }
-
 }

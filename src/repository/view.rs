@@ -8,6 +8,17 @@ use cqrs_es::{Aggregate, View};
 pub struct RocksDbViewRepository<V, A> {
     _phantom: PhantomData<(V, A)>,
 }
+impl<V, A> RocksDbViewRepository<V, A>
+where
+    V: View<A>,
+    A: Aggregate,
+{
+    pub fn new(view_name: &str, path: &str) -> Self {
+        Self {
+            _phantom: Default::default(),
+        }
+    }
+}
 
 #[async_trait]
 impl<V, A> ViewRepository<V, A> for RocksDbViewRepository<V, A>

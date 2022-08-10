@@ -16,10 +16,11 @@ where
     CqrsFramework::new(store, query_processor, services)
 }
 
-
 #[cfg(test)]
 mod test {
-    use crate::testing::tests::{TestAggregate, TestQueryRepository, TestServices, TestView, get_rocks_db_storage_path};
+    use crate::testing::tests::{
+        get_rocks_db_storage_path, TestAggregate, TestQueryRepository, TestServices, TestView,
+    };
     use crate::{rocks_db_cqrs, RocksDbViewRepository};
     use std::sync::Arc;
 
@@ -27,12 +28,14 @@ mod test {
     async fn test_valid_cqrs_framework() {
         // let pool = default_postgress_pool(TEST_CONNECTION_STRING).await;
         let (tmp_dir, file_path) = get_rocks_db_storage_path();
-        let path = file_path.as_os_str().to_str().expect("failed to get string from os string");
-        //
+        let path = file_path
+            .as_os_str()
+            .to_str()
+            .expect("failed to get string from os string");
+        let view_repo = RocksDbViewRepository::<TestView, TestAggregate>::new("test_view", path);
         // let repo =
         //     PostgresViewRepository::<TestView, TestAggregate>::new("test_view", pool.clone());
         // let query = TestQueryRepository::new(Arc::new(repo));
         // let _ps = postgres_cqrs(pool, vec![Box::new(query)], TestServices);
     }
 }
-
