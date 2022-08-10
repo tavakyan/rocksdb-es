@@ -1,2 +1,1 @@
-mod error;
-mod event_repository;
+mod repository;
