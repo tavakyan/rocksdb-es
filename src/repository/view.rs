@@ -3,9 +3,11 @@ use std::marker::PhantomData;
 use async_trait::async_trait;
 use cqrs_es::persist::{PersistenceError, ViewContext, ViewRepository};
 use cqrs_es::{Aggregate, View};
+use rocksdb::{DBWithThreadMode, MultiThreaded, SingleThreaded, DB};
 
 /// A RockDB backed query repository for use in backing a `GenericQuery`.
 pub struct RocksDbViewRepository<V, A> {
+    db: DBWithThreadMode<SingleThreaded>,
     _phantom: PhantomData<(V, A)>,
 }
 impl<V, A> RocksDbViewRepository<V, A>
@@ -14,9 +16,10 @@ where
     A: Aggregate,
 {
     pub fn new(view_name: &str, path: &str) -> Self {
-        Self {
-            _phantom: Default::default(),
-        }
+        /// TODO: Convert this to MultiThreaded
+        let db = DB::open_default(path).unwrap();
+        let _phantom = Default::default();
+        Self { db, _phantom }
     }
 }
 
