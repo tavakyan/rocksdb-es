@@ -32,10 +32,8 @@ mod test {
             .as_os_str()
             .to_str()
             .expect("failed to get string from os string");
-        let view_repo = RocksDbViewRepository::<TestView, TestAggregate>::new("test_view", path);
-        // let repo =
-        //     PostgresViewRepository::<TestView, TestAggregate>::new("test_view", pool.clone());
-        // let query = TestQueryRepository::new(Arc::new(repo));
-        // let _ps = postgres_cqrs(pool, vec![Box::new(query)], TestServices);
+        let repo = RocksDbViewRepository::<TestView, TestAggregate>::new("test_view", path);
+        let query = TestQueryRepository::new(Arc::new(repo));
+        let _ps = rocks_db_cqrs(vec![Box::new(query)], TestServices);
     }
 }
