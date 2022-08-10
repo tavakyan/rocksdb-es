@@ -124,5 +124,35 @@ pub(crate) mod tests {
         let mut file = File::create(file_path).expect("Error: Unable to create a temporary file");
         file
     }
+    pub(crate) fn test_event_envelope(
+        id: &str,
+        sequence: usize,
+        event: TestEvent,
+    ) -> SerializedEvent {
+        let payload: Value = serde_json::to_value(&event).unwrap();
+        SerializedEvent {
+            aggregate_id: id.to_string(),
+            sequence,
+            aggregate_type: TestAggregate::aggregate_type().to_string(),
+            event_type: event.event_type().to_string(),
+            event_version: event.event_version().to_string(),
+            payload,
+            metadata: Default::default(),
+        }
+    }
+
+    pub(crate) fn snapshot_context(
+        aggregate_id: String,
+        current_sequence: usize,
+        current_snapshot: usize,
+        aggregate: Value,
+    ) -> SerializedSnapshot {
+        SerializedSnapshot {
+            aggregate_id,
+            aggregate,
+            current_sequence,
+            current_snapshot,
+        }
+    }
 
 }
