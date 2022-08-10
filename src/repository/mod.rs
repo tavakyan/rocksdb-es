@@ -1,3 +1,4 @@
+mod cqrs;
 mod event;
 mod view;
 
