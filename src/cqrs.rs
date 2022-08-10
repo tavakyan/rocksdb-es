@@ -15,3 +15,5 @@ where
     let store = PersistedEventStore::new_event_store(repo);
     CqrsFramework::new(store, query_processor, services)
 }
+
+// TODO: Port test_valid_cqrs_framework, but first port test aggregate
