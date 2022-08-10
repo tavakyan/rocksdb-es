@@ -4,7 +4,7 @@ pub(crate) mod tests {
     use async_trait::async_trait;
     use cqrs_es::persist::{GenericQuery, SerializedEvent, SerializedSnapshot};
     use cqrs_es::{Aggregate, DomainEvent, EventEnvelope, View};
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
     use serde_json::Value;
     use std::fmt::{Display, Formatter};
 
@@ -98,4 +98,18 @@ pub(crate) mod tests {
     impl std::error::Error for TestError {}
 
     pub(crate) enum TestCommand {}
+
+    pub(crate) type TestQueryRepository =
+        GenericQuery<RocksDbViewRepository<TestView, TestAggregate>, TestView, TestAggregate>;
+
+    #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+    pub(crate) struct TestView {
+        pub(crate) events: Vec<TestEvent>,
+    }
+
+    impl View<TestAggregate> for TestView {
+        fn update(&mut self, event: &EventEnvelope<TestAggregate>) {
+            self.events.push(event.payload.clone());
+        }
+    }
 }
