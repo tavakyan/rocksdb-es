@@ -7,6 +7,8 @@ pub(crate) mod tests {
     use serde::{Deserialize, Serialize};
     use serde_json::Value;
     use std::fmt::{Display, Formatter};
+    use std::fs::File;
+    use tempfile::tempdir;
 
     #[derive(Debug, Serialize, Deserialize, PartialEq)]
     pub(crate) struct TestAggregate {
@@ -112,4 +114,15 @@ pub(crate) mod tests {
             self.events.push(event.payload.clone());
         }
     }
+
+    pub(crate) const TEST_STORAGE_FILE_NAME: &'static str = "TEMPORARY_ROCKS_DB_TEST_STORAGE";
+
+    pub(crate) fn get_rocks_db_storage_path() -> File {
+        let tmp = tempdir().expect("Error: Unable to create a temporary directory");
+
+        let file_path = tmp.path().join(TEST_STORAGE_FILE_NAME);
+        let mut file = File::create(file_path).expect("Error: Unable to create a temporary file");
+        file
+    }
+
 }
