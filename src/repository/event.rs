@@ -4,6 +4,7 @@ use cqrs_es::persist::{
 };
 use cqrs_es::Aggregate;
 
+/// An event repository relying on RocksDB for persistence.
 pub struct RocksDbEventRepository;
 
 #[async_trait]
