@@ -5,13 +5,14 @@ use cqrs_es::{Aggregate, CqrsFramework, Query};
 
 /// Create a CqrsFramework that uses RocksDb
 pub fn rocks_db_cqrs<A>(
+    path: &str,
     query_processor: Vec<Box<dyn Query<A>>>,
     services: A::Services,
 ) -> RocksDbCqrs<A>
 where
     A: Aggregate,
 {
-    let repo = RocksDbEventRepository {};
+    let repo = RocksDbEventRepository::new(path);
     let store = PersistedEventStore::new_event_store(repo);
     CqrsFramework::new(store, query_processor, services)
 }
@@ -34,6 +35,6 @@ mod test {
             .expect("failed to get string from os string");
         let repo = RocksDbViewRepository::<TestView, TestAggregate>::new("test_view", path);
         let query = TestQueryRepository::new(Arc::new(repo));
-        let _ps = rocks_db_cqrs(vec![Box::new(query)], TestServices);
+        let _ps = rocks_db_cqrs(path, vec![Box::new(query)], TestServices);
     }
 }

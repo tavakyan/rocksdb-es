@@ -3,9 +3,19 @@ use cqrs_es::persist::{
     PersistedEventRepository, PersistenceError, ReplayStream, SerializedEvent, SerializedSnapshot,
 };
 use cqrs_es::Aggregate;
+use rocksdb::DB;
 
 /// An event repository relying on RocksDB for persistence.
-pub struct RocksDbEventRepository;
+pub struct RocksDbEventRepository {
+    db: DB,
+}
+
+impl RocksDbEventRepository {
+    pub fn new(path: &str) -> Self {
+        let db = DB::open_default(path).unwrap();
+        Self { db }
+    }
+}
 
 #[async_trait]
 impl PersistedEventRepository for RocksDbEventRepository {
@@ -62,62 +72,63 @@ mod test {
     };
     use crate::RocksDbEventRepository;
 
-    // #[tokio::test]
-    // async fn event_repositories() {
-    //     let pool = default_postgress_pool(TEST_CONNECTION_STRING).await;
-    //     let id = uuid::Uuid::new_v4().to_string();
-    //     let event_repo: PostgresEventRepository =
-    //         PostgresEventRepository::new(pool.clone()).with_streaming_channel_size(1);
-    //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
-    //     assert!(events.is_empty());
-    //
-    //     event_repo
-    //         .insert_events::<TestAggregate>(&[
-    //             test_event_envelope(&id, 1, TestEvent::Created(Created { id: id.clone() })),
-    //             test_event_envelope(
-    //                 &id,
-    //                 2,
-    //                 TestEvent::Tested(Tested {
-    //                     test_name: "a test was run".to_string(),
-    //                 }),
-    //             ),
-    //         ])
-    //         .await
-    //         .unwrap();
-    //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
-    //     assert_eq!(2, events.len());
-    //     events.iter().for_each(|e| assert_eq!(&id, &e.aggregate_id));
-    //
-    //     // Optimistic lock error
-    //     let result = event_repo
-    //         .insert_events::<TestAggregate>(&[
-    //             test_event_envelope(
-    //                 &id,
-    //                 3,
-    //                 TestEvent::SomethingElse(SomethingElse {
-    //                     description: "this should not persist".to_string(),
-    //                 }),
-    //             ),
-    //             test_event_envelope(
-    //                 &id,
-    //                 2,
-    //                 TestEvent::SomethingElse(SomethingElse {
-    //                     description: "bad sequence number".to_string(),
-    //                 }),
-    //             ),
-    //         ])
-    //         .await
-    //         .unwrap_err();
-    //     match result {
-    //         PostgresAggregateError::OptimisticLock => {}
-    //         _ => panic!("invalid error result found during insert: {}", result),
-    //     };
-    //
-    //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
-    //     assert_eq!(2, events.len());
-    //
-    //     verify_replay_stream(&id, event_repo).await;
-    // }
+    #[tokio::test]
+    async fn event_repositories() {
+        let (tmp, path) = get_rocks_db_storage_path();
+        let path = path.to_str().unwrap();
+        //     let pool = default_postgress_pool(TEST_CONNECTION_STRING).await;
+        let id = uuid::Uuid::new_v4().to_string();
+        let event_repo: RocksDbEventRepository = RocksDbEventRepository::new(path);
+        //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
+        //     assert!(events.is_empty());
+        //
+        //     event_repo
+        //         .insert_events::<TestAggregate>(&[
+        //             test_event_envelope(&id, 1, TestEvent::Created(Created { id: id.clone() })),
+        //             test_event_envelope(
+        //                 &id,
+        //                 2,
+        //                 TestEvent::Tested(Tested {
+        //                     test_name: "a test was run".to_string(),
+        //                 }),
+        //             ),
+        //         ])
+        //         .await
+        //         .unwrap();
+        //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
+        //     assert_eq!(2, events.len());
+        //     events.iter().for_each(|e| assert_eq!(&id, &e.aggregate_id));
+        //
+        //     // Optimistic lock error
+        //     let result = event_repo
+        //         .insert_events::<TestAggregate>(&[
+        //             test_event_envelope(
+        //                 &id,
+        //                 3,
+        //                 TestEvent::SomethingElse(SomethingElse {
+        //                     description: "this should not persist".to_string(),
+        //                 }),
+        //             ),
+        //             test_event_envelope(
+        //                 &id,
+        //                 2,
+        //                 TestEvent::SomethingElse(SomethingElse {
+        //                     description: "bad sequence number".to_string(),
+        //                 }),
+        //             ),
+        //         ])
+        //         .await
+        //         .unwrap_err();
+        //     match result {
+        //         PostgresAggregateError::OptimisticLock => {}
+        //         _ => panic!("invalid error result found during insert: {}", result),
+        //     };
+        //
+        //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
+        //     assert_eq!(2, events.len());
+        //
+        //     verify_replay_stream(&id, event_repo).await;
+    }
     //
     // async fn verify_replay_stream(id: &str, event_repo: PostgresEventRepository) {
     //     let mut stream = event_repo
