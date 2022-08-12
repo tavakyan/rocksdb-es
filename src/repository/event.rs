@@ -3,16 +3,16 @@ use cqrs_es::persist::{
     PersistedEventRepository, PersistenceError, ReplayStream, SerializedEvent, SerializedSnapshot,
 };
 use cqrs_es::Aggregate;
-use rocksdb::DB;
+use rocksdb::{DBWithThreadMode, Options, SingleThreaded, DB};
+use std::sync::{Arc, RwLock};
 
 /// An event repository relying on RocksDB for persistence.
 pub struct RocksDbEventRepository {
-    db: DB,
+    db: Arc<RwLock<DB>>,
 }
 
 impl RocksDbEventRepository {
-    pub fn new(path: &str) -> Self {
-        let db = DB::open_default(path).unwrap();
+    pub fn new(db: Arc<RwLock<DB>>) -> Self {
         Self { db }
     }
 }
@@ -71,6 +71,7 @@ mod test {
         TestAggregate, TestEvent, Tested, TEST_STORAGE_FILE_NAME,
     };
     use crate::RocksDbEventRepository;
+    use rocksdb;
 
     #[tokio::test]
     async fn event_repositories() {
@@ -78,7 +79,8 @@ mod test {
         let path = path.to_str().unwrap();
         //     let pool = default_postgress_pool(TEST_CONNECTION_STRING).await;
         let id = uuid::Uuid::new_v4().to_string();
-        let event_repo: RocksDbEventRepository = RocksDbEventRepository::new(path);
+        // let db = rocksdb::DB::open_default(path);
+        // let event_repo: RocksDbEventRepository = RocksDbEventRepository::new(path);
         //     let events = event_repo.get_events::<TestAggregate>(&id).await.unwrap();
         //     assert!(events.is_empty());
         //
