@@ -1,4 +1,5 @@
 use std::marker::PhantomData;
+use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
@@ -16,8 +17,10 @@ where
     V: View<A>,
     A: Aggregate,
 {
-    pub fn new(view_name: &str, db: Arc<RwLock<DB>>) -> Self {
+    pub fn new(view_name: &str, path: PathBuf) -> Self {
         /// TODO: Convert this to MultiThreaded
+        let db = DB::open_default(path).unwrap();
+        let db = Arc::new(RwLock::new(db));
         let _phantom = Default::default();
         Self { db, _phantom }
     }
